@@ -11,18 +11,37 @@ const app = new App({
 });
 
 
-app.event('app_mention', async ({ event, say }) => {
+app.event('file_shared', async ({ event, say, client }) => {
   try {
-    if (event.files && event.files.length > 0) {
-      const fileInfo = event.files[0];
-      const fileUrl = fileInfo.url_private;
-      const fileName = fileInfo.name;
-      const savePath = path.join(__dirname, '..', fileName);
+    const fileInfo = await client.files.info({
+      file: event.file_id
+    });
+
+    if (fileInfo.file) {
+      const fileUrl = fileInfo.file.url_private;
+      const fileName = fileInfo.file.name;
+
+      const interestFiles = [
+        'Agrotoken Cycle - harvest estimate',
+        'input_vega'
+      ]
+
+      const isInterestFile = interestFiles.some((interest) => fileName.includes(interest));
+
+      if (isInterestFile === false) {
+        console.log(`${fileName} não é para ser salvo! ❌`)
+        return
+      }
+
+      console.log(`${fileName} é para ser salvo! ✅`)
 
       const fileResponse = await axios.get(fileUrl, {
         headers: { Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` },
         responseType: 'stream'
       });
+
+      const outputFileName = fileName.includes('Agrotoken Cycle - harvest estimate') ? 'input_eda.xlsx' : fileName
+      const savePath = path.join(__dirname, '..', outputFileName);
 
       const writer = fs.createWriteStream(savePath);
       fileResponse.data.pipe(writer);
@@ -33,14 +52,15 @@ app.event('app_mention', async ({ event, say }) => {
       });
 
       await say({
-        text: `Arquivo "${fileName}" foi salvo com sucesso no servidor!`,
-        channel: event.channel
+        text: `Arquivo "${fileName}" foi salvo com sucesso no servidor com nome ${outputFileName}!`,
+        channel: event.channel_id
       });
     }
   } catch (error) {
     console.error('Erro ao processar o evento:', error);
   }
 });
+
 
 (async () => {
   await app.start();
