@@ -41,7 +41,7 @@ app.event('file_shared', async ({ event, say, client }) => {
       });
 
       const outputFileName = fileName.includes('Agrotoken Cycle - harvest estimate') ? 'input_eda.xlsx' : fileName
-      const savePath = path.join(__dirname, '..', outputFileName);
+      const savePath = path.join(__dirname, '..', '..', 'monitoratoken_pipeline/AutomatizacionCM/input', outputFileName);
 
       const writer = fs.createWriteStream(savePath);
       fileResponse.data.pipe(writer);
