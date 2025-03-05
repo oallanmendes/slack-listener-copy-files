@@ -1,7 +1,11 @@
+require('dotenv').config();
+
 const { App } = require('@slack/bolt');
 const fs = require('fs');
 const axios = require('axios');
 const path = require('path');
+
+const HOME_DIR_SCRIPT = process.env.HOME_DIR_SCRIPT || '/home/agtk-sftp/files/monitoratoken_pipeline';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -16,6 +20,7 @@ app.message('ping', async ({ event, say }) => {
     channel: event.channel_id
   });
 })
+
 
 
 app.event('file_shared', async ({ event, say, client }) => {
@@ -48,7 +53,7 @@ app.event('file_shared', async ({ event, say, client }) => {
       });
 
       const outputFileName = fileName.includes('Agrotoken Cycle - harvest estimate') ? 'input_eda.xlsx' : fileName
-      const savePath = path.join(__dirname, '..', '..', 'monitoratoken_pipeline/AutomatizacionCM/input', outputFileName);
+      const savePath = path.join(HOME_DIR_SCRIPT, 'AutomatizacionCM', 'input', outputFileName);
 
       const writer = fs.createWriteStream(savePath);
       fileResponse.data.pipe(writer);
