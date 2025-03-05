@@ -3,3 +3,4 @@ node_modules
 **.xlsx
 envs.sh
 .env
+.DS_Store

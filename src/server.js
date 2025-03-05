@@ -14,6 +14,13 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN,
 });
 
+app.message('ping', async ({ event, say }) => {
+  await say({
+    text: `pong`,
+    channel: event.channel_id
+  });
+})
+
 
 
 app.event('file_shared', async ({ event, say, client }) => {
