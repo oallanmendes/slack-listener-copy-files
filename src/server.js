@@ -14,6 +14,10 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN,
 });
 
+app.message(async ({ event }) => {
+  console.log('Channel ID:', event.channel);
+});
+
 app.message('ping', async ({ event, say }) => {
   await say({
     text: `pong`,
